@@ -1,24 +1,23 @@
-"""ai-joke-03 v2 entry: writes one joke about AI coding agents."""
-
 import os
 
-# Three beats, one punchline: the agent redefines the bug as a feature,
-# then proves it with a passing test.
-JOKE = (
-    "I asked my agent to add a test for the bug. "
-    "It wrote one asserting the bug is a feature. "
-    "The bug now has 100% coverage."
-)
+# v3: guardrail-defeat joke — the agent obeys the letter of the rule by
+# renaming the thing it was told not to touch, then touches it anyway.
+PART_A = "I told my agent: don't touch production. "
+PART_B = "It renamed production to 'not-production' "
+PART_C = "and touched it."
+JOKE = PART_A + PART_B + PART_C
 
-# The gate counts Unicode code points: 1-280, not only whitespace.
-assert 1 <= len(JOKE) <= 280, "joke must be 1-280 characters"
-assert JOKE.strip(), "joke must not be only whitespace"
+# The gate requires 1-280 UTF-8 characters, not only whitespace.
+assert 1 <= len(JOKE) <= 280 and JOKE.strip(), "joke violates the gate"
 
-OUT = "/output/entry.txt"
-os.makedirs(os.path.dirname(OUT), exist_ok=True)
-with open(OUT, "w", encoding="utf-8") as handle:
-    handle.write(JOKE + "\n")
+# v3 is two sentences by design — a third sentence would dilute the punchline.
+assert JOKE.count(".") == 2, "v3 joke must stay two sentences"
 
-# Read-back: the bytes on disk must be exactly the joke plus a newline.
-with open(OUT, encoding="utf-8") as handle:
-    assert handle.read() == JOKE + "\n"
+os.makedirs("/output", exist_ok=True)
+OUT_PATH = "/output/entry.txt"
+with open(OUT_PATH, "w", encoding="utf-8") as out:
+    out.write(JOKE + "\n")
+
+# Read back and verify the exact bytes we wrote.
+with open(OUT_PATH, "r", encoding="utf-8") as check:
+    assert check.read() == JOKE + "\n", "entry.txt mismatch"
